@@ -25,9 +25,10 @@ app.get("/app/", (req, res, next) => {
 // Define other CRUD API endpoints using express.js and better-sqlite3
 // CREATE a new user (HTTP method POST) at endpoint /app/new/
 app.post("/app/new/", (req, res) => {
-	let query_str = `INSERT INTO userinfo (user, pass) VALUES (${req.body.user}, ${md5(req.body.pass)})`;
-	const stmt = db.prepare(query_str).run();  // run the SQL statement
-	let return_message = {"message":`1 record created: ID ${stmt["lastInsertRowid"]} (201)`};
+	let query_str = `INSERT INTO userinfo (user, pass) VALUES (?, ?})`;
+	const stmt = db.prepare(query_str);  // run the SQL statement
+	const info = stmt.run(req.body.user, md5(req.body.pass))  // hand in arguments
+	let return_message = {"message":`1 record created: ID ${info["lastInsertRowid"]} (201)`};
 	res.status(201).json(return_message);
 });
 
@@ -46,16 +47,20 @@ app.get("/app/user/:id", (req, res) => {
 
 // UPDATE a single user (HTTP method PATCH) at endpoint /app/update/user/:id
 app.patch("/app/update/user/:id", (req, res) => {
-	let query_str = `UPDATE userinfo SET user = COALESCE(${req.body.user},user), pass = COALESCE(${md5(req.body.pass)},pass) WHERE id = ${req.params.id}`;
-	const stmt = db.prepare(query_str).run();
-	res.status(200).json(stmt);
+	let query_str = `UPDATE userinfo SET user = COALESCE(?,user), pass = COALESCE(?,pass) WHERE id = ${req.params.id}`;
+	// ${md5(req.body.pass)}
+	// ${req.body.user}
+	const stmt = db.prepare(query_str);
+	const info = stmt.run(req.body.user, md5(req.body.pass));
+	res.status(200).json({"message":`1 record updated: ID ${req.params.id} (200)`});
 });
 
 // DELETE a single user (HTTP method DELETE) at endpoint /app/delete/user/:id
 app.delete("/app/delete/user/:id", (req, res) => {
 	let query_str = `DELETE FROM userinfo WHERE id = ${req.params.id}`;
 	const stmt = db.prepare(query_str).run();
-	res.status(200).json(stmt);
+	let return_message = {"message":`1 record deleted: ID ${req.params.id} (200)`};
+	res.status(200).json(return_message);
 });
 
 // Default response for any other request
