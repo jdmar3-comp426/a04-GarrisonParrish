@@ -1,10 +1,10 @@
 // Define app using express
-var express = require("express")
-var app = express()
+var express = require("express");
+var app = express();
 // Require database SCRIPT file
-var db = require("./database.js")
+var db = require("./database.js");
 // Require md5 MODULE
-var md5 = require("md5")
+var md5 = require("md5");
 // Make Express use its own built-in body parser
 app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
@@ -25,7 +25,7 @@ app.get("/app/", (req, res, next) => {
 // Define other CRUD API endpoints using express.js and better-sqlite3
 // CREATE a new user (HTTP method POST) at endpoint /app/new/
 app.post("/app/new/", (req, res) => {
-	let query_str = `INSERT INTO userinfo (user, pass) VALUES (${req.body.user}, ${req.body.pass})`;
+	let query_str = `INSERT INTO userinfo (user, pass) VALUES (${req.body.user}, ${md5(req.body.pass)})`;
 	const stmt = db.prepare(query_str).run();  // run the SQL statement
 	let return_message = "hello world";  // {"message":`1 record created: ID ${stmt["lastInsertRowid"]} (201)`}
 	res.status(201).json(return_message);
@@ -46,7 +46,7 @@ app.get("/app/user/:id", (req, res) => {
 
 // UPDATE a single user (HTTP method PATCH) at endpoint /app/update/user/:id
 app.patch("/app/update/user/:id", (req, res) => {
-	let query_str = `UPDATE userinfo SET user = COALESCE(${req.body.user},user), pass = COALESCE(${req.body.pass},pass) WHERE id = ${req.params.id}`;
+	let query_str = `UPDATE userinfo SET user = COALESCE(${req.body.user},user), pass = COALESCE(${md5(req.body.pass)},pass) WHERE id = ${req.params.id}`;
 	const stmt = db.prepare(query_str).run();
 	res.status(200).json(stmt);
 });
