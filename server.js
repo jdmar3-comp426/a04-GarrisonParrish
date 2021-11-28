@@ -10,7 +10,7 @@ app.use(express.urlencoded({ extended: true }));
 app.use(express.json());
 
 // Set server port
-let HTTP_PORT = 5000;
+var HTTP_PORT = 5000;
 
 // Start server
 app.listen(HTTP_PORT, () => {
@@ -32,6 +32,11 @@ app.get("/app/users", (req, res) => {
 });
 
 // READ a single user (HTTP method GET) at endpoint /app/user/:id
+app.get("/app/users", (req, res) => {
+	const stmt = db.prepare("SELECT * FROM userinfo WHERE id = 2");
+	const result_user = stmt.get();
+	res.status(200).json(result_user);
+});
 
 // UPDATE a single user (HTTP method PATCH) at endpoint /app/update/user/:id
 
