@@ -46,13 +46,15 @@ app.get("/app/user/:id", (req, res) => {
 
 // UPDATE a single user (HTTP method PATCH) at endpoint /app/update/user/:id
 app.patch("/app/update/user/:id", (req, res) => {
-	const stmt = db.prepare("UPDATE userinfo SET user = COALESCE(?,user), pass = COALESCE(?,pass) WHERE id = ?").run();
+	let query_str = `UPDATE userinfo SET user = COALESCE(${req.body.user},user), pass = COALESCE(${req.body.pass},pass) WHERE id = ${req.params.id}`;
+	const stmt = db.prepare(query_str).run();
 	res.status(200).json(stmt);
 });
 
 // DELETE a single user (HTTP method DELETE) at endpoint /app/delete/user/:id
 app.delete("/app/delete/user/:id", (req, res) => {
-	db.prepare("DELETE FROM userinfo WHERE id = ?").run();
+	let query_str = `DELETE FROM userinfo WHERE id = ${req.params.id}`;
+	const stmt = db.prepare(query_str).run();
 	res.status(200).json(stmt);
 });
 
