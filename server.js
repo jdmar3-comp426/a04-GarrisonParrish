@@ -27,7 +27,7 @@ app.get("/app/", (req, res, next) => {
 app.post("/app/new/", (req, res) => {
 	let query_str = `INSERT INTO userinfo (user, pass) VALUES (${req.body.user}, ${md5(req.body.pass)})`;
 	const stmt = db.prepare(query_str).run();  // run the SQL statement
-	let return_message = "hello world";  // {"message":`1 record created: ID ${stmt["lastInsertRowid"]} (201)`}
+	let return_message = {"message":`1 record created: ID ${stmt["lastInsertRowid"]} (201)`};
 	res.status(201).json(return_message);
 });
 
